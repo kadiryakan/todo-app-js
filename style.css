@@ -32,6 +32,8 @@ header h1 {
   max-width: 500px;
   margin: 30px auto;
   padding: 20px;
+  border: 1px solid;
+  border-radius: 10px;
 }
 
 .edit-mode {

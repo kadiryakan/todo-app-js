@@ -5,6 +5,7 @@ const clearBtn = document.getElementById("clear");
 const itemFilter = document.getElementById("filter");
 const formBtn = itemForm.querySelector("button");
 
+// creating todo
 function addItem(e) {
   e.preventDefault();
   const newItem = itemInput.value;
@@ -22,6 +23,7 @@ function addItem(e) {
   itemInput.value = "";
 }
 
+// creating buttons
 function createButton(classes) {
   const button = document.createElement("button");
   button.className = classes;
@@ -30,16 +32,43 @@ function createButton(classes) {
   return button;
 }
 
+// creating icons
 function createIcon(classes) {
   const icon = document.createElement("i");
   icon.className = classes;
   return icon;
 }
 
-function clearAll(e) {
-  e.preventDefault();
-  itemFilter.remove();
-  itemList.remove();
+// removing to do
+function removeItem(e) {
+  if (e.target.parentElement.classList.contains("remove-item")) {
+    e.target.parentElement.parentElement.remove();
+  }
 }
+
+// clearing all of to do's
+function clearItem() {
+  while (itemList.firstChild) {
+    itemList.removeChild(itemList.firstChild);
+  }
+}
+
+const onFocus = () => {
+  console.log("Input is focused");
+  itemInput.style.outlineStyle = "none";
+  itemInput.style.outlineWidth = "1px";
+  itemInput.style.outlineColor = "gray";
+  itemInput.style.boxShadow = "rgba(0, 0, 0, 0.24) 0px 3px 8px";
+};
+
+const onBlur = () => {
+  console.log("Input is focused");
+  itemInput.style.boxShadow = "none";
+};
+
+//! addEventListeners
 itemForm.addEventListener("submit", addItem);
-clearBtn.addEventListener("click", clearAll);
+itemList.addEventListener("click", removeItem);
+clearBtn.addEventListener("click", clearItem);
+itemInput.addEventListener("focus", onFocus);
+itemInput.addEventListener("blur", onBlur);
