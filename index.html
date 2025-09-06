@@ -12,14 +12,13 @@
       referrerpolicy="no-referrer"
     />
     <link rel="stylesheet" href="style.css" />
-    <title>Shopping List</title>
+    <title>TODO App</title>
   </head>
   <body>
+    <div class="textOnTop">
+      <h1>TODO APP</h1>
+    </div>
     <div class="container">
-      <header>
-        <img src="images/note.png" alt="" />
-        <h1>Shopping List</h1>
-      </header>
       <form id="item-form">
         <div class="form-control">
           <input
@@ -27,12 +26,12 @@
             class="form-input"
             id="item-input"
             name="item"
-            placeholder="Enter Item"
+            placeholder="Enter TODO"
           />
         </div>
         <div class="form-control">
           <button type="submit" class="btn">
-            <i class="fa-solid fa-plus"></i> Add Item
+            <i class="fa-solid fa-plus"></i> Add TODO
           </button>
         </div>
       </form>
@@ -42,7 +41,7 @@
           type="text"
           class="form-input-filter"
           id="filter"
-          placeholder="Filter Items"
+          placeholder="Filter"
         />
       </div>
 

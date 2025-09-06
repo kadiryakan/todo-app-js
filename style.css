@@ -25,12 +25,30 @@ header {
 
 header h1 {
   font-weight: 300;
-  margin-left: 10px;
+  margin: 0px 10px 0px 10px;
+}
+
+.textOnTop{
+  max-width: 500px;
+  margin: 10px auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.textOnTop  i{
+  font-size: 25px;
+}
+
+.textOnTop  button{
+  margin-top: 13px;
+  background-color: transparent;
+  border: none;
 }
 
 .container {
   max-width: 500px;
-  margin: 30px auto;
+  margin: 10px auto;
   padding: 20px;
   border: 1px solid;
   border-radius: 10px;

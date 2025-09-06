@@ -4,6 +4,7 @@ const itemList = document.getElementById("item-list");
 const clearBtn = document.getElementById("clear");
 const itemFilter = document.getElementById("filter");
 const formBtn = itemForm.querySelector("button");
+let isEditMode = false;
 
 function displayItems() {
   const itemsFromStorage = getItemsFromStorage();
@@ -14,33 +15,53 @@ function displayItems() {
 //! creating todo
 function onAddItemSubmit(e) {
   e.preventDefault();
+
   const newItem = itemInput.value;
-  if (newItem === "" && newItem === " ") {
+
+  //? Validate Input
+  if (newItem === "") {
     alert("Please add an item");
     return;
   }
-  //? Create item DOM Element
+
+  //? Checking for edit mode
+  if (isEditMode) {
+    const itemToEdit = itemList.querySelector(".edit-mode");
+
+    removeItemFromStorage(itemToEdit.textContent);
+    itemToEdit.classList.remove("edit-mode");
+    itemToEdit.remove();
+    isEditMode = false;
+  } else {
+    if (checkIfItemExists(newItem)) {
+      alert("That item already exists!");
+      return;
+    }
+  }
+
+  //? Create item DOM element
   addItemToDOM(newItem);
 
-  //? add item to localStorage
+  //? Add item to local storage
   addItemToStorage(newItem);
+
+  checkUI();
+
   itemInput.value = "";
 }
 
-//! adding to DOM storage
 function addItemToDOM(item) {
+  //? Create list item
   const li = document.createElement("li");
   li.appendChild(document.createTextNode(item));
 
   const button = createButton("remove-item btn-link text-red");
-
   li.appendChild(button);
 
-  // adding li to the dom
+  //? Add li to the DOM
   itemList.appendChild(li);
 }
 
-//! creating buttons
 function createButton(classes) {
   const button = document.createElement("button");
   button.className = classes;
@@ -49,21 +70,19 @@ function createButton(classes) {
   return button;
 }
 
-//! creating icons
 function createIcon(classes) {
   const icon = document.createElement("i");
   icon.className = classes;
   return icon;
 }
 
-//! adding to local storage
 function addItemToStorage(item) {
   const itemsFromStorage = getItemsFromStorage();
 
-  //? add new item to array
+  //? Add new item to array
   itemsFromStorage.push(item);
 
-  //? Convert to JSON String and set to localStorage
+  //? Convert to JSON string and set to localStorage
   localStorage.setItem("items", JSON.stringify(itemsFromStorage));
 }
 
@@ -79,44 +98,72 @@ function getItemsFromStorage() {
   return itemsFromStorage;
 }
 
-//! removing to do
-function removeItem(e) {
+function onClickItem(e) {
   if (e.target.parentElement.classList.contains("remove-item")) {
-    if (confirm("Are you sure to delete todo?")) {
-      e.target.parentElement.parentElement.remove();
-
-      checkUI();
-    }
+    removeItem(e.target.parentElement.parentElement);
+  } else {
+    setItemToEdit(e.target);
   }
 }
 
-//! clearing all of to do's
+function checkIfItemExists(item) {
+  const itemsFromStorage = getItemsFromStorage();
+  return itemsFromStorage.includes(item);
+}
+
+function setItemToEdit(item) {
+  isEditMode = true;
+
+  itemList
+    .querySelectorAll("li")
+    .forEach((i) => i.classList.remove("edit-mode"));
+
+  item.classList.add("edit-mode");
+  formBtn.innerHTML = '<i class="fa-solid fa-pen"></i>   Update Item';
+  formBtn.style.backgroundColor = "#228B22";
+  itemInput.value = item.textContent;
+}
+
+function removeItem(item) {
+  if (confirm("Are you sure?")) {
+    //? Remove item from DOM
+    item.remove();
+
+    //? Remove item from storage
+    removeItemFromStorage(item.textContent);
+
+    checkUI();
+  }
+}
+
+function removeItemFromStorage(item) {
+  let itemsFromStorage = getItemsFromStorage();
+
+  //? Filter out item to be removed
+  itemsFromStorage = itemsFromStorage.filter((i) => i !== item);
+
+  //? Re-set to localstorage
+  localStorage.setItem("items", JSON.stringify(itemsFromStorage));
+}
+
 function clearItems() {
   while (itemList.firstChild) {
     itemList.removeChild(itemList.firstChild);
   }
+
+  //? Clear from localStorage
+  localStorage.removeItem("items");
+
   checkUI();
 }
 
-//! when clicked to do item input it shows shadow
-const onFocus = () => {
-  itemInput.style.outlineStyle = "none";
-  itemInput.style.outlineWidth = "1px";
-  itemInput.style.outlineColor = "gray";
-  itemInput.style.boxShadow = "rgba(0, 0, 0, 0.24) 0px 3px 8px";
-};
-
-//! when blurred to item input it not shows shadow
-const onBlur = () => {
-  itemInput.style.boxShadow = "none";
-};
-
-//! filtering to do's
 function filterItems(e) {
-  const items = document.querySelectorAll("li");
+  const items = itemList.querySelectorAll("li");
   const text = e.target.value.toLowerCase();
+
   items.forEach((item) => {
     const itemName = item.firstChild.textContent.toLowerCase();
+
     if (itemName.indexOf(text) != -1) {
       item.style.display = "flex";
     } else {
@@ -126,26 +173,33 @@ function filterItems(e) {
 }
 
 function checkUI() {
+  itemInput.value = "";
+
   const items = itemList.querySelectorAll("li");
+
   if (items.length === 0) {
-    itemFilter.style.display = "none";
     clearBtn.style.display = "none";
+    itemFilter.style.display = "none";
   } else {
-    itemFilter.style.display = "block";
     clearBtn.style.display = "block";
+    itemFilter.style.display = "block";
   }
+
+  formBtn.innerHTML = '<i class="fa-solid fa-plus"></i> Add Item';
+  formBtn.style.backgroundColor = "#333";
+
+  isEditMode = false;
 }
 
-//! Initialize app
+//? Initialize
 function init() {
-  //! addEventListeners
-  itemList.addEventListener("click", removeItem);
+  // Event Listeners
   itemForm.addEventListener("submit", onAddItemSubmit);
+  itemList.addEventListener("click", onClickItem);
   clearBtn.addEventListener("click", clearItems);
   itemFilter.addEventListener("input", filterItems);
-  itemInput.addEventListener("focus", onFocus);
-  itemInput.addEventListener("blur", onBlur);
   document.addEventListener("DOMContentLoaded", displayItems);
+
   checkUI();
 }
 
